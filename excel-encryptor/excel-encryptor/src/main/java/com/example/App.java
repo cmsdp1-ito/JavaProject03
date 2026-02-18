@@ -3,24 +3,31 @@ package com.example;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.poifs.crypt.*;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;  // ← これが重要
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+
 import java.io.*;
+import java.util.Base64;
 
 public class App {
     public static void main(String[] args) throws Exception {
 
         if (args.length < 3) {
-            System.out.println("Usage: java -jar excel-encryptor.jar <input> <output> <password>");
+            // System.out.println("Usage: java -jar excel-encryptor.jar <output> <password> <base64>");
             return;
         }
 
-        String input = args[0];
-        String output = args[1];
-        String password = args[2];
+        String output = args[0];
+        String password = args[1];
+        String base64 = args[2];
 
-        FileInputStream fis = new FileInputStream(input);
-        XSSFWorkbook workbook = (XSSFWorkbook) WorkbookFactory.create(fis);
+        // ★ C# から渡された Base64 をデコード
+        byte[] excelBytes = Base64.getDecoder().decode(base64);
 
+        // ★ メモリ上の Excel を読み込む
+        ByteArrayInputStream bais = new ByteArrayInputStream(excelBytes);
+        XSSFWorkbook workbook = (XSSFWorkbook) WorkbookFactory.create(bais);
+
+        // ★ 暗号化して保存
         POIFSFileSystem fs = new POIFSFileSystem();
         EncryptionInfo info = new EncryptionInfo(EncryptionMode.agile);
         Encryptor enc = info.getEncryptor();
@@ -34,6 +41,6 @@ public class App {
         fs.writeFilesystem(fos);
         fos.close();
 
-        System.out.println("Encrypted successfully.");
+        // System.out.println("Encrypted Excel created.");
     }
 }
