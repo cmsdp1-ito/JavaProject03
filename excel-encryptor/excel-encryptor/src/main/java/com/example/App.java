@@ -3,6 +3,7 @@ package com.example;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.poifs.crypt.*;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;  // ← これが重要
 import java.io.*;
 
 public class App {
